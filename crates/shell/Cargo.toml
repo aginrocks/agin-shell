@@ -1,0 +1,10 @@
+[package]
+name = "shell"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+gpui-kit = "0.7.3"
+
+[lints]
+workspace = true

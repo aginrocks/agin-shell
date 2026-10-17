@@ -1,0 +1,32 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+similar_names = "allow"
+missing_errors_doc = "allow"
+must_use_candidate = "allow"
+missing_const_for_fn = "allow"
+future_not_send = "allow"
+unwrap_in_result = "warn"
+unwrap_used = "warn"
+useless_let_if_seq = "warn"
+option_if_let_else = "allow"
+derive_partial_eq_without_eq = "allow"
+needless_continue = "allow"
+
+[workspace.dependencies]
+tracing = "0.1.44"
+tracing-error = "0.2.1"
+tracing-subscriber = { version = "0.3.23", features = [
+    "chrono",
+    "json",
+    "env-filter",
+    "local-time",
+    "serde",
+    "serde_json",
+    "time",
+] }
+gpui-kit = "0.7.3"
