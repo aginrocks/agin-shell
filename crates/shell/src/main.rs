@@ -1,8 +1,15 @@
+use std::collections::HashSet;
+
 use color_eyre::Result;
 use gpui_kit::{application, assets::Assets};
 use tracing::level_filters::LevelFilter;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{fmt::format::FmtSpan, layer::SubscriberExt, util::SubscriberInitExt};
+
+use crate::bar::BarConfig;
+
+mod bar;
+mod constants;
 
 pub fn init_tracing(filter: LevelFilter) -> Result<()> {
     tracing_subscriber::Registry::default()
@@ -28,6 +35,19 @@ async fn main() -> Result<()> {
     let app = application().with_assets(Assets {});
     app.run(move |cx| {
         gpui_tokio::init(cx);
+
+        let displays = cx.displays();
+        dbg!(&displays);
+
+        let mut displays_set = HashSet::new();
+        for display in displays {
+            displays_set.insert(display.id());
+        }
+
+        let config = BarConfig {
+            displays: displays_set,
+        };
+        config.display_per_output(cx);
     });
 
     Ok(())
