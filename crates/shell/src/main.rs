@@ -1,38 +1,34 @@
-use gpui_kit::{
-    AppContext, Context, IntoElement, ParentElement, Render, Styled, Window, WindowOptions,
-    application,
-    component::button::{Button, ButtonVariants},
-    div,
-};
+use color_eyre::Result;
+use gpui_kit::{application, assets::Assets};
+use tracing::level_filters::LevelFilter;
+use tracing_error::ErrorLayer;
+use tracing_subscriber::{fmt::format::FmtSpan, layer::SubscriberExt, util::SubscriberInitExt};
 
-struct HelloWorld;
+pub fn init_tracing(filter: LevelFilter) -> Result<()> {
+    tracing_subscriber::Registry::default()
+        .with(tracing_subscriber::fmt::layer().with_span_events(FmtSpan::NEW | FmtSpan::CLOSE))
+        .with(ErrorLayer::default())
+        .with(
+            tracing_subscriber::EnvFilter::builder()
+                .with_default_directive(filter.into())
+                .with_env_var("RUST_LOG")
+                .from_env()?,
+        )
+        .try_init()?;
 
-impl Render for HelloWorld {
-    fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .flex()
-            .flex_col()
-            .size_full()
-            .items_center()
-            .justify_center()
-            .gap_2()
-            .child("Hello, World!")
-            .child(
-                Button::new("hello")
-                    .primary()
-                    .label("Click me")
-                    .on_click(|_, _, _| println!("Clicked!")),
-            )
-    }
+    Ok(())
 }
 
-fn main() {
-    application()
-        .with_assets(gpui_kit::assets::Assets)
-        .run(|cx| {
-            gpui_kit::init(cx);
+#[tokio::main]
+async fn main() -> Result<()> {
+    color_eyre::install()?;
 
-            gpui_kit::open_window(WindowOptions::default(), cx, |_, cx| cx.new(|_| HelloWorld))
-                .expect("Failed to open window");
-        });
+    init_tracing(LevelFilter::INFO)?;
+
+    let app = application().with_assets(Assets {});
+    app.run(move |cx| {
+        gpui_tokio::init(cx);
+    });
+
+    Ok(())
 }
