@@ -16,6 +16,7 @@ useless_let_if_seq = "warn"
 option_if_let_else = "allow"
 derive_partial_eq_without_eq = "allow"
 needless_continue = "allow"
+unreadable_literal = "allow"                 # hex colors generate false positives
 
 [workspace.dependencies]
 color-eyre = "0.6.5"

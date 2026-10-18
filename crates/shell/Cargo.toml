@@ -12,6 +12,8 @@ tracing-error.workspace = true
 tracing-subscriber.workspace = true
 gpui-tokio.workspace = true
 smithay-client-toolkit = "0.21.1"
+serde = { version = "1.0.229", features = ["derive"] }
+config = "0.15.27"
 
 [lints]
 workspace = true

@@ -10,6 +10,7 @@ use crate::bar::BarConfig;
 
 mod bar;
 mod constants;
+mod settings;
 
 pub fn init_tracing(filter: LevelFilter) -> Result<()> {
     tracing_subscriber::Registry::default()

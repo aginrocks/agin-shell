@@ -25,12 +25,13 @@ impl BarConfig {
         }
     }
 
-    const fn height() -> u32 {
-        const BAR_PADDING: u32 = 12;
-        const BAR_CONTENT_HEIGHT: u32 = 24;
-        BAR_PADDING * 2 + BAR_CONTENT_HEIGHT
+    const fn height() -> f32 {
+        const BAR_PADDING: f32 = 12.0;
+        const BAR_CONTENT_HEIGHT: f32 = 24.0;
+        BAR_PADDING * 2f32 + BAR_CONTENT_HEIGHT
     }
 
+    #[tracing::instrument(skip(self, cx))]
     fn display_on_output(&self, cx: &'_ mut App, id: DisplayId) {
         let options = WindowOptions {
             // window_bounds: todo!(),
@@ -38,7 +39,7 @@ impl BarConfig {
                 namespace: BAR_NAMESPACE.to_string(),
                 layer: Layer::Top,
                 anchor: Anchor::TOP | Anchor::LEFT | Anchor::RIGHT,
-                // exclusive_zone: todo!(),
+                exclusive_zone: Some(px(Self::height())),
                 // exclusive_edge: todo!(),
                 // margin: todo!(),
                 keyboard_interactivity: KeyboardInteractivity::None,
@@ -49,7 +50,7 @@ impl BarConfig {
             app_id: Some(APP_ID.to_string()),
             window_bounds: Some(WindowBounds::Windowed(Bounds {
                 origin: point(px(0.), px(0.)),
-                size: Size::new(px(1.), px(Self::height() as f32)),
+                size: Size::new(px(1.), px(Self::height())),
             })),
             window_decorations: Some(WindowDecorations::Client),
             ..Default::default()
