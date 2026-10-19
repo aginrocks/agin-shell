@@ -1,16 +1,17 @@
 use std::collections::HashSet;
 
-use color_eyre::Result;
+use anyhow::Result;
 use gpui_kit::{application, assets::Assets};
 use tracing::level_filters::LevelFilter;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{fmt::format::FmtSpan, layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::bar::BarConfig;
+use crate::{bar::BarConfig, settings::Settings};
 
 mod bar;
 mod constants;
 mod settings;
+mod wayland;
 
 pub fn init_tracing(filter: LevelFilter) -> Result<()> {
     tracing_subscriber::Registry::default()
@@ -29,13 +30,16 @@ pub fn init_tracing(filter: LevelFilter) -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    color_eyre::install()?;
-
     init_tracing(LevelFilter::INFO)?;
+
+    // TODO: Live reload
+    let settings = Settings::try_load()?;
 
     let app = application().with_assets(Assets {});
     app.run(move |cx| {
         gpui_tokio::init(cx);
+
+        cx.set_global(settings);
 
         let displays = cx.displays();
         dbg!(&displays);

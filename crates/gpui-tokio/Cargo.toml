@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-color-eyre.workspace = true
+anyhow.workspace = true
 gpui-kit.workspace = true
 gpui-pre-util.workspace = true
 tokio.workspace = true

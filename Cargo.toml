@@ -17,9 +17,10 @@ option_if_let_else = "allow"
 derive_partial_eq_without_eq = "allow"
 needless_continue = "allow"
 unreadable_literal = "allow"                 # hex colors generate false positives
+cast_precision_loss = "allow"
 
 [workspace.dependencies]
-color-eyre = "0.6.5"
+anyhow = "1.0.104"
 tokio = { version = "1.53.3", features = ["full"] }
 tracing = "0.1.44"
 tracing-error = "0.2.1"

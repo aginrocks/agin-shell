@@ -1,8 +1,9 @@
 use std::collections::HashSet;
 
+use anyhow::Result;
 use gpui_kit::{
-    App, AppContext, Bounds, Context, DisplayId, Size, WindowBackgroundAppearance, WindowBounds,
-    WindowDecorations, WindowKind, WindowOptions,
+    App, AppContext, Bounds, Context, DisplayId, Pixels, Size, WindowBackgroundAppearance,
+    WindowBounds, WindowDecorations, WindowKind, WindowOptions,
     layer_shell::{Anchor, KeyboardInteractivity, Layer, LayerShellOptions},
     point, px,
 };
@@ -10,6 +11,7 @@ use gpui_kit::{
 use crate::{
     bar::per_output::LayerShellExample,
     constants::{APP_ID, BAR_NAMESPACE},
+    settings::Settings,
 };
 
 mod per_output;
@@ -19,27 +21,33 @@ pub struct BarConfig {
 }
 
 impl BarConfig {
-    pub fn display_per_output(&self, cx: &'_ mut App) {
+    pub fn display_per_output(&self, cx: &'_ mut App) -> Result<()> {
         for display in &self.displays {
-            self.display_on_output(cx, *display);
+            Self::display_on_output(cx, *display)?;
         }
+        Ok(())
     }
 
-    const fn height() -> f32 {
-        const BAR_PADDING: f32 = 12.0;
-        const BAR_CONTENT_HEIGHT: f32 = 24.0;
-        BAR_PADDING * 2f32 + BAR_CONTENT_HEIGHT
+    fn height(cx: &App) -> Pixels {
+        let settings = cx.global::<Settings>();
+        px(
+            (settings.bar.margins.top + settings.bar.margins.bottom + settings.bar.inner_height)
+                as f32,
+        )
     }
 
-    #[tracing::instrument(skip(self, cx))]
-    fn display_on_output(&self, cx: &'_ mut App, id: DisplayId) {
+    pub fn watch_for_output_changes(&mut self) {}
+
+    #[tracing::instrument(skip(cx))]
+    fn display_on_output(cx: &'_ mut App, id: DisplayId) -> Result<()> {
+        let height = Self::height(cx);
         let options = WindowOptions {
             // window_bounds: todo!(),
             kind: WindowKind::LayerShell(LayerShellOptions {
                 namespace: BAR_NAMESPACE.to_string(),
                 layer: Layer::Top,
                 anchor: Anchor::TOP | Anchor::LEFT | Anchor::RIGHT,
-                exclusive_zone: Some(px(Self::height())),
+                exclusive_zone: Some(height),
                 // exclusive_edge: todo!(),
                 // margin: todo!(),
                 keyboard_interactivity: KeyboardInteractivity::None,
@@ -50,11 +58,13 @@ impl BarConfig {
             app_id: Some(APP_ID.to_string()),
             window_bounds: Some(WindowBounds::Windowed(Bounds {
                 origin: point(px(0.), px(0.)),
-                size: Size::new(px(1.), px(Self::height())),
+                size: Size::new(px(1.), height),
             })),
             window_decorations: Some(WindowDecorations::Client),
             ..Default::default()
         };
-        cx.open_window(options, |_, cx| cx.new(LayerShellExample::new));
+        cx.open_window(options, |_, cx| cx.new(LayerShellExample::new))?;
+
+        Ok(())
     }
 }
