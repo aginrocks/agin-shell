@@ -9,12 +9,13 @@ use gpui_kit::{
 };
 
 use crate::{
-    bar::per_output::LayerShellExample,
+    bar::per_output::PerOutputBar,
     constants::{APP_ID, BAR_NAMESPACE},
     settings::Settings,
 };
 
 mod per_output;
+mod widget;
 
 pub struct BarConfig {
     pub displays: HashSet<DisplayId>,
@@ -63,7 +64,7 @@ impl BarConfig {
             window_decorations: Some(WindowDecorations::Client),
             ..Default::default()
         };
-        cx.open_window(options, |_, cx| cx.new(LayerShellExample::new))?;
+        cx.open_window(options, |_, cx| cx.new(|_| PerOutputBar))?;
 
         Ok(())
     }
